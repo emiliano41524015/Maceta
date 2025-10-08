@@ -1,6 +1,5 @@
 const STORAGE_KEY = 'macetaModules';
 const MODULES_ENDPOINT = './data/modules.json';
-const USERS_ENDPOINT = './data/users.json';
 
 const actuatorsLabels = {
   bomba: { on: 'Bomba ON', off: 'Encender bomba', icon: '🚰' },
@@ -11,29 +10,15 @@ const actuatorsLabels = {
 const potsContainer = document.querySelector('#pots-container');
 const addPotButton = document.querySelector('#add-pot');
 const potTemplate = document.querySelector('#pot-card-template');
-const summaryElements = {
-  total: document.querySelector('#summary-total'),
-  connected: document.querySelector('#summary-connected'),
-  alerts: document.querySelector('#summary-alerts'),
-  humidity: document.querySelector('#summary-humidity')
-};
-const filterButtons = document.querySelectorAll('.filter-button');
-const adminToggleButton = document.querySelector('#toggle-admin');
-const adminPanel = document.querySelector('#admin-panel');
-const adminCloseControls = document.querySelectorAll('[data-close-admin]');
-const adminUsersList = document.querySelector('#admin-users');
-const adminModulesList = document.querySelector('#admin-modules');
 
 let modules = [];
 let simulationInterval;
-let users = [];
-let activeFilter = 'all';
 
 async function loadModules() {
   const localModules = loadFromStorage();
   if (localModules.length) {
     modules = localModules;
-    syncModulesUI();
+    renderModules();
     startSimulation();
     return;
   }
@@ -46,7 +31,7 @@ async function loadModules() {
     const data = await response.json();
     modules = data;
     saveToStorage(modules);
-    syncModulesUI();
+    renderModules();
     startSimulation();
   } catch (error) {
     console.error(error);
@@ -55,29 +40,6 @@ async function loadModules() {
         <p>No pudimos cargar los datos de las macetas.</p>
         <p class="hint">Revisa la conexión o vuelve a intentarlo más tarde.</p>
       </div>
-    `;
-  }
-}
-
-async function loadUsers() {
-  if (!adminUsersList) return;
-  try {
-    const response = await fetch(USERS_ENDPOINT);
-    if (!response.ok) {
-      throw new Error('No se pudieron cargar los usuarios');
-    }
-    const data = await response.json();
-    users = Array.isArray(data) ? data : [];
-    renderAdminUsers();
-  } catch (error) {
-    console.warn('No se pudieron cargar los usuarios', error);
-    adminUsersList.innerHTML = `
-      <li class="admin-user">
-        <div class="admin-user__meta">
-          <strong>Sin información disponible</strong>
-          <span class="role-pill">Temporal</span>
-        </div>
-      </li>
     `;
   }
 }
@@ -102,36 +64,11 @@ function saveToStorage(data) {
 }
 
 function renderModules() {
-  if (!potsContainer) return;
   potsContainer.innerHTML = '';
-  const filteredModules = getFilteredModules();
-
-  if (!filteredModules.length) {
-    potsContainer.innerHTML = `
-      <div class="empty-state">
-        <p>No hay macetas para mostrar con el filtro seleccionado.</p>
-        <p class="hint">Ajusta los filtros o agrega una nueva maceta.</p>
-      </div>
-    `;
-    return;
-  }
-
-  filteredModules.forEach((module) => {
+  modules.forEach((module) => {
     const card = buildPotCard(module);
     potsContainer.appendChild(card);
   });
-}
-
-function getFilteredModules() {
-  if (activeFilter === 'connected') {
-    return modules.filter((module) => module.estado === 'Conectado');
-  }
-
-  if (activeFilter === 'alerts') {
-    return modules.filter((module) => hasActiveAlert(module));
-  }
-
-  return modules;
 }
 
 function buildPotCard(module) {
@@ -183,12 +120,6 @@ function applyAlerts(fragment, sensores) {
   }
 }
 
-function hasActiveAlert(module) {
-  if (!module || !module.sensores) return false;
-  const { humedad, nivel } = module.sensores;
-  return humedad < 40 || nivel < 20;
-}
-
 function setupActuatorButtons(fragment, actuadores, id) {
   fragment.querySelectorAll('.actuator').forEach((button) => {
     const actuatorKey = button.dataset.actuator;
@@ -225,7 +156,6 @@ function toggleActuator(id, actuatorKey) {
     return updatedModule;
   });
   saveToStorage(modules);
-  renderAdminModules();
 }
 
 function updateCardActuator(id, actuatorKey, state) {
@@ -246,8 +176,6 @@ function startSimulation() {
       return updated;
     });
     saveToStorage(modules);
-    updateSummary();
-    renderAdminModules();
   }, 5000);
 }
 
@@ -306,231 +234,14 @@ function addNewPot() {
 
   modules = [newModule, ...modules];
   saveToStorage(modules);
-  syncModulesUI();
+  renderModules();
 }
 
 function getRandomValue(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function syncModulesUI() {
-  renderModules();
-  updateSummary();
-  renderAdminModules();
-}
-
-function updateSummary() {
-  if (!summaryElements.total) return;
-  const total = modules.length;
-  const connected = modules.filter((module) => module.estado === 'Conectado').length;
-  const alerts = modules.filter((module) => hasActiveAlert(module)).length;
-  const humidityAverage =
-    total > 0
-      ? Math.round(
-          modules.reduce(
-            (acc, module) => acc + (module?.sensores?.humedad ?? 0),
-            0
-          ) / total
-        )
-      : null;
-
-  summaryElements.total.textContent = total;
-  summaryElements.connected.textContent = connected;
-  summaryElements.alerts.textContent = alerts;
-  summaryElements.humidity.textContent = humidityAverage !== null ? `${humidityAverage}%` : '--';
-}
-
-function renderAdminModules() {
-  if (!adminModulesList) return;
-  if (!modules.length) {
-    adminModulesList.innerHTML = `
-      <li class="admin-module">
-        <div class="admin-module__info">
-          <strong>No hay macetas registradas</strong>
-          <span>Agrega una nueva maceta para comenzar el monitoreo.</span>
-        </div>
-      </li>
-    `;
-    return;
-  }
-
-  adminModulesList.innerHTML = modules
-    .map((module) => {
-      const sensors = module.sensores ?? { humedad: 0, temperatura: 0, nivel: 0 };
-      const alerts = [];
-      if (sensors.humedad < 40) alerts.push('Humedad baja');
-      if (sensors.nivel < 20) alerts.push('Nivel de agua bajo');
-      const alertsText = alerts.length ? alerts.join(' · ') : 'Sensores estables';
-      const hasAlerts = alerts.length > 0;
-      const statusOffline = module.estado !== 'Conectado';
-      const actuatorText = formatActuators(module.actuadores);
-
-      return `
-        <li class="admin-module">
-          <div class="admin-module__info">
-            <strong>${module.nombre}</strong>
-            <span>${sensors.humedad}% 💧 · ${sensors.temperatura}°C 🌡️ · ${sensors.nivel}% 🔋</span>
-            <span class="admin-module__alerts ${hasAlerts ? 'is-active' : ''}">${alertsText}</span>
-            <span class="admin-module__actuators">Actuadores: ${actuatorText}</span>
-          </div>
-          <div class="admin-module__actions">
-            <span class="status-pill ${statusOffline ? 'is-offline' : ''}">${module.estado}</span>
-            <button class="admin-toggle ${statusOffline ? 'is-offline' : ''}" data-action="toggle-connection" data-id="${module.id}" type="button">
-              ${statusOffline ? 'Reconectar' : 'Pausar módulo'}
-            </button>
-          </div>
-        </li>
-      `;
-    })
-    .join('');
-}
-
-function formatActuators(actuadores = {}) {
-  const labels = {
-    bomba: 'Bomba',
-    panel: 'Panel solar',
-    ventilador: 'Ventilador'
-  };
-  const entries = Object.entries(actuadores);
-  if (!entries.length) return 'Sin configuración';
-  return entries.map(([key, value]) => `${labels[key] ?? key}: ${value}`).join(' · ');
-}
-
-function renderAdminUsers() {
-  if (!adminUsersList) return;
-  if (!users.length) {
-    adminUsersList.innerHTML = `
-      <li class="admin-user">
-        <div class="admin-user__meta">
-          <strong>No hay responsables asignados</strong>
-          <span class="role-pill">Pendiente</span>
-        </div>
-      </li>
-    `;
-    return;
-  }
-
-  adminUsersList.innerHTML = users
-    .map((user) => {
-      const contact = user.correo ? `<span class="admin-user__contact">${user.correo}</span>` : '';
-      return `
-        <li class="admin-user">
-          <div class="admin-user__meta">
-            <strong>${user.nombre}</strong>
-            <span class="role-pill">${formatRole(user.rol)}</span>
-          </div>
-          ${contact}
-        </li>
-      `;
-    })
-    .join('');
-}
-
-function formatRole(role = '') {
-  const map = {
-    admin: 'Administrador',
-    operador: 'Operador',
-    soporte: 'Soporte',
-    invitado: 'Invitado'
-  };
-  return map[role] ?? role;
-}
-
-function setFilter(filter) {
-  if (activeFilter === filter) return;
-  activeFilter = filter;
-  updateFilterButtons();
-  renderModules();
-}
-
-function updateFilterButtons() {
-  filterButtons.forEach((button) => {
-    const isActive = button.dataset.filter === activeFilter;
-    button.classList.toggle('is-active', isActive);
-    button.setAttribute('aria-pressed', String(isActive));
-  });
-}
-
-function openAdminPanel() {
-  if (!adminPanel) return;
-  adminPanel.classList.add('is-open');
-  adminPanel.setAttribute('aria-hidden', 'false');
-  if (adminToggleButton) {
-    adminToggleButton.setAttribute('aria-expanded', 'true');
-  }
-  renderAdminModules();
-}
-
-function closeAdminPanel() {
-  if (!adminPanel) return;
-  adminPanel.classList.remove('is-open');
-  adminPanel.setAttribute('aria-hidden', 'true');
-  if (adminToggleButton) {
-    adminToggleButton.setAttribute('aria-expanded', 'false');
-  }
-}
-
-function toggleConnection(id) {
-  modules = modules.map((module) => {
-    if (module.id !== id) return module;
-    const isConnected = module.estado === 'Conectado';
-    const nextState = isConnected ? 'Desconectado' : 'Conectado';
-    return {
-      ...module,
-      estado: nextState,
-      actuadores: isConnected
-        ? Object.keys(module.actuadores).reduce(
-            (acc, key) => ({
-              ...acc,
-              [key]: 'OFF'
-            }),
-            {}
-          )
-        : module.actuadores
-    };
-  });
-  saveToStorage(modules);
-  syncModulesUI();
-}
-
-if (addPotButton) {
-  addPotButton.addEventListener('click', addNewPot);
-}
-
-filterButtons.forEach((button) => {
-  button.addEventListener('click', () => {
-    const { filter } = button.dataset;
-    if (!filter) return;
-    setFilter(filter);
-  });
-});
-
-updateFilterButtons();
-
-if (adminToggleButton) {
-  adminToggleButton.addEventListener('click', openAdminPanel);
-}
-
-adminCloseControls.forEach((control) => {
-  control.addEventListener('click', () => {
-    closeAdminPanel();
-  });
-});
-
-if (adminModulesList) {
-  adminModulesList.addEventListener('click', (event) => {
-    const button = event.target.closest('[data-action="toggle-connection"]');
-    if (!button) return;
-    const id = Number(button.dataset.id);
-    toggleConnection(id);
-  });
-}
-
-document.addEventListener('keydown', (event) => {
-  if (event.key === 'Escape' && adminPanel?.classList.contains('is-open')) {
-    closeAdminPanel();
-  }
-});
+addPotButton.addEventListener('click', addNewPot);
 
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
@@ -541,5 +252,3 @@ document.addEventListener('visibilitychange', () => {
 });
 
 loadModules();
-loadUsers();
-renderAdminUsers();
