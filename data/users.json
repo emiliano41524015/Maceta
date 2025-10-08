@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "nombre": "Emiliano Godoy",
+    "rol": "admin",
+    "correo": "emiliano@nube.detierra"
+  },
+  {
+    "id": 2,
+    "nombre": "Carolina Ruiz",
+    "rol": "operador",
+    "correo": "carolina@nube.detierra"
+  },
+  {
+    "id": 3,
+    "nombre": "Martín Pérez",
+    "rol": "soporte",
+    "correo": "martin@nube.detierra"
+  }
+]
