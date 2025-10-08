@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
   </head>
@@ -18,272 +18,56 @@
         <span class="brand-icon" aria-hidden="true">🌱</span>
         <div>
           <h1>Nube de Tierra</h1>
-          <p class="subtitle">Panel de macetas inteligentes</p>
+          <p class="subtitle">Panel de control de macetas inteligentes</p>
         </div>
       </div>
-      <div class="header-actions">
-        <div class="role-switcher" aria-live="polite">
-          <label class="role-label" for="role-selector">Rol</label>
-          <select id="role-selector" class="role-select" aria-label="Cambiar rol de usuario">
-            <option value="admin">Administrador</option>
-            <option value="user">Usuario</option>
-          </select>
-        </div>
-        <button id="add-pot" class="primary-action" type="button">
-          <span aria-hidden="true">➕</span> Agregar maceta
-        </button>
-        <button id="toggle-admin" class="secondary-action" type="button">
-          <span aria-hidden="true">👤</span> Panel admin
-        </button>
-      </div>
+      <button id="add-pot" class="primary-action" type="button">
+        <span aria-hidden="true">➕</span> Agregar maceta
+      </button>
     </header>
 
     <main>
-      <section class="dashboard-summary" aria-label="Resumen del sistema">
-        <article class="summary-card">
-          <p class="summary-label">Total de macetas</p>
-          <p id="summary-total" class="summary-value">0</p>
-        </article>
-        <article class="summary-card">
-          <p class="summary-label">Conectadas</p>
-          <p id="summary-connected" class="summary-value">0</p>
-        </article>
-        <article class="summary-card">
-          <p class="summary-label">Con alertas</p>
-          <p id="summary-alerts" class="summary-value">0</p>
-        </article>
-        <article class="summary-card">
-          <p class="summary-label">Humedad promedio</p>
-          <p id="summary-humidity" class="summary-value">0%</p>
-        </article>
-      </section>
-
-      <section class="filters" aria-label="Filtros de macetas">
-        <button class="filter-button is-active" data-filter="all" type="button">
-          Todas
-        </button>
-        <button class="filter-button" data-filter="connected" type="button">
-          Conectadas
-        </button>
-        <button class="filter-button" data-filter="alerts" type="button">
-          Alertas
-        </button>
-      </section>
-
       <section id="pots-container" class="pots-grid" aria-live="polite"></section>
     </main>
 
     <template id="pot-card-template">
       <article class="pot-card" data-id="">
         <header class="pot-card__header">
-          <div class="pot-card__title">
-            <h2 class="pot-name"></h2>
-            <time class="pot-updated" data-last-update datetime="">Actualización pendiente</time>
-          </div>
-          <div class="pot-card__status">
-            <span class="access-badge" data-access-badge></span>
-            <span class="connection-status" role="status"></span>
-          </div>
+          <h2 class="pot-name"></h2>
+          <span class="connection-status" role="status"></span>
         </header>
-        <div class="sensor-values" data-sensors></div>
-        <div class="actuator-controls" data-actuators></div>
-        <div class="card-actions">
-          <button class="ghost-action" data-card-action="edit" type="button">Editar</button>
-          <button class="ghost-action" data-card-action="history" type="button">
-            Historial
-          </button>
-          <button class="ghost-action danger" data-card-action="delete" type="button">
-            Eliminar
-          </button>
-        </div>
-        <div class="event-log">
-          <div class="event-log__header">
-            <h3>Registro de eventos</h3>
-            <span class="log-badge" data-log-count>0</span>
+        <div class="sensor-values">
+          <div class="sensor-value">
+            <span class="icon" aria-hidden="true">💧</span>
+            <div>
+              <p>Humedad</p>
+              <p class="value humidity"></p>
+            </div>
+            <span class="alert" aria-hidden="true" title="Alerta de humedad"></span>
           </div>
-          <ul class="event-log__list" data-log></ul>
+          <div class="sensor-value">
+            <span class="icon" aria-hidden="true">🌡️</span>
+            <div>
+              <p>Temperatura</p>
+              <p class="value temperature"></p>
+            </div>
+          </div>
+          <div class="sensor-value">
+            <span class="icon" aria-hidden="true">🔋</span>
+            <div>
+              <p>Nivel de agua</p>
+              <p class="value level"></p>
+            </div>
+            <span class="alert" aria-hidden="true" title="Alerta de nivel"></span>
+          </div>
+        </div>
+        <div class="actuator-controls">
+          <button class="actuator" data-actuator="bomba" type="button"></button>
+          <button class="actuator" data-actuator="panel" type="button"></button>
+          <button class="actuator" data-actuator="ventilador" type="button"></button>
         </div>
       </article>
     </template>
-
-    <aside id="admin-panel" class="admin-panel" aria-hidden="true">
-      <div class="admin-panel__overlay" data-close-admin></div>
-      <div
-        class="admin-panel__content"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="admin-panel-title"
-      >
-        <header class="admin-panel__header">
-          <div>
-            <h2 id="admin-panel-title">Panel administrativo</h2>
-            <p class="admin-panel__subtitle">Supervisa conexiones y responsables</p>
-          </div>
-          <button class="icon-button" type="button" data-close-admin aria-label="Cerrar panel">
-            ✕
-          </button>
-        </header>
-        <section class="admin-section">
-          <h3>Equipo responsable</h3>
-          <ul id="admin-users" class="admin-users" aria-live="polite"></ul>
-        </section>
-        <section class="admin-section">
-          <h3>Macetas registradas</h3>
-          <ul id="admin-modules" class="admin-modules" aria-live="polite"></ul>
-        </section>
-      </div>
-    </aside>
-
-    <div id="modal-overlay" class="modal-overlay" aria-hidden="true"></div>
-
-    <section
-      id="module-editor"
-      class="modal"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="module-editor-title"
-      aria-hidden="true"
-    >
-      <form class="modal__content" id="module-form">
-        <header class="modal__header">
-          <div>
-            <h2 id="module-editor-title">Nueva maceta</h2>
-            <p class="modal__subtitle">Configura sensores, actuadores y umbrales</p>
-          </div>
-          <button class="icon-button" type="button" data-close-modal aria-label="Cerrar">
-            ✕
-          </button>
-        </header>
-        <div class="modal__body">
-          <input type="hidden" id="module-id" name="moduleId" />
-          <div class="form-group">
-            <label for="module-name">Nombre de la maceta</label>
-            <input id="module-name" name="name" type="text" required minlength="3" />
-          </div>
-          <fieldset class="form-group">
-            <legend>Sensores activos</legend>
-            <label class="checkbox">
-              <input type="checkbox" name="sensors" value="humedad" checked />
-              Humedad
-            </label>
-            <label class="checkbox">
-              <input type="checkbox" name="sensors" value="temperatura" checked />
-              Temperatura
-            </label>
-            <label class="checkbox">
-              <input type="checkbox" name="sensors" value="nivel" checked />
-              Nivel de agua
-            </label>
-          </fieldset>
-          <fieldset class="form-group">
-            <legend>Actuadores configurados</legend>
-            <label class="checkbox">
-              <input type="checkbox" name="actuators" value="bomba" checked />
-              Bomba
-            </label>
-            <label class="checkbox">
-              <input type="checkbox" name="actuators" value="panel" checked />
-              Panel solar
-            </label>
-            <label class="checkbox">
-              <input type="checkbox" name="actuators" value="ventilador" checked />
-              Ventilador
-            </label>
-          </fieldset>
-          <fieldset class="form-group">
-            <legend>Acceso de roles</legend>
-            <label class="checkbox">
-              <input type="checkbox" name="roles" value="admin" checked disabled />
-              Administrador (control total)
-            </label>
-            <input type="hidden" name="roles" value="admin" />
-            <label class="checkbox">
-              <input type="checkbox" name="roles" value="user" checked />
-              Usuarios (solo lectura)
-            </label>
-            <p class="form-hint">Desmarca la opción de usuarios si deseas ocultar esta maceta para el rol de visualización.</p>
-          </fieldset>
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="threshold-humidity">Humedad mínima (%)</label>
-              <input
-                id="threshold-humidity"
-                name="humidity"
-                type="number"
-                min="0"
-                max="100"
-                required
-              />
-            </div>
-            <div class="form-group">
-              <label for="threshold-temperature">Temperatura máxima (°C)</label>
-              <input
-                id="threshold-temperature"
-                name="temperature"
-                type="number"
-                min="0"
-                max="60"
-                required
-              />
-            </div>
-            <div class="form-group">
-              <label for="threshold-level">Nivel de agua mínimo (%)</label>
-              <input
-                id="threshold-level"
-                name="level"
-                type="number"
-                min="0"
-                max="100"
-                required
-              />
-            </div>
-          </div>
-        </div>
-        <footer class="modal__footer">
-          <button class="secondary-action" type="button" data-close-modal>Cancelar</button>
-          <button class="primary-action" type="submit">Guardar cambios</button>
-        </footer>
-      </form>
-    </section>
-
-    <section
-      id="history-modal"
-      class="modal"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="history-title"
-      aria-hidden="true"
-    >
-      <div class="modal__content">
-        <header class="modal__header">
-          <div>
-            <h2 id="history-title">Historial de la maceta</h2>
-            <p class="modal__subtitle">Registros cronológicos de sensores y actuadores</p>
-          </div>
-          <button class="icon-button" type="button" data-close-modal aria-label="Cerrar">
-            ✕
-          </button>
-        </header>
-        <div class="modal__body">
-          <table class="history-table">
-            <thead>
-              <tr>
-                <th>Fecha y hora</th>
-                <th>Humedad</th>
-                <th>Temperatura</th>
-                <th>Nivel</th>
-                <th>Actuadores</th>
-                <th>Alertas</th>
-              </tr>
-            </thead>
-            <tbody id="history-table-body"></tbody>
-          </table>
-        </div>
-        <footer class="modal__footer">
-          <button class="secondary-action" type="button" data-close-modal>Cerrar</button>
-        </footer>
-      </div>
-    </section>
 
     <script src="app.js" type="module"></script>
   </body>

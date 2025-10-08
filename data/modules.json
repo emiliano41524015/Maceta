@@ -4,53 +4,13 @@
     "nombre": "Maceta Principal",
     "estado": "Conectado",
     "sensores": { "humedad": 47, "temperatura": 23, "nivel": 72 },
-    "actuadores": { "bomba": "OFF", "panel": "ON", "ventilador": "OFF" },
-    "configuracion": { "humedadMin": 40, "temperaturaMax": 32, "aguaMin": 30 },
-    "rolesPermitidos": ["admin", "user"],
-    "ultimaActualizacion": "2025-01-01T12:00:00.000Z",
-    "sensoresDisponibles": ["humedad", "temperatura", "nivel"],
-    "actuadoresDisponibles": ["bomba", "panel", "ventilador"],
-    "historial": [
-      {
-        "timestamp": "2025-01-01T12:00:00.000Z",
-        "sensores": { "humedad": 47, "temperatura": 23, "nivel": 72 },
-        "actuadores": { "bomba": "OFF", "panel": "ON", "ventilador": "OFF" },
-        "alertas": []
-      }
-    ],
-    "eventos": [
-      {
-        "timestamp": "2025-01-01T12:00:00.000Z",
-        "mensaje": "Inicialización del módulo",
-        "tipo": "info"
-      }
-    ]
+    "actuadores": { "bomba": "OFF", "panel": "ON", "ventilador": "OFF" }
   },
   {
     "id": 2,
     "nombre": "Maceta de Hierbas",
-    "estado": "Conectado",
-    "sensores": { "humedad": 32, "temperatura": 20, "nivel": 18 },
-    "actuadores": { "bomba": "OFF", "panel": "OFF", "ventilador": "OFF" },
-    "configuracion": { "humedadMin": 45, "temperaturaMax": 30, "aguaMin": 25 },
-    "rolesPermitidos": ["admin"],
-    "ultimaActualizacion": "2025-01-01T12:05:00.000Z",
-    "sensoresDisponibles": ["humedad", "temperatura", "nivel"],
-    "actuadoresDisponibles": ["bomba", "ventilador"],
-    "historial": [
-      {
-        "timestamp": "2025-01-01T12:05:00.000Z",
-        "sensores": { "humedad": 32, "temperatura": 20, "nivel": 18 },
-        "actuadores": { "bomba": "OFF", "panel": "OFF", "ventilador": "OFF" },
-        "alertas": ["Humedad baja", "Nivel de agua bajo"]
-      }
-    ],
-    "eventos": [
-      {
-        "timestamp": "2025-01-01T12:05:00.000Z",
-        "mensaje": "Maceta en estado de alerta por humedad y nivel",
-        "tipo": "alert"
-      }
-    ]
+    "estado": "Desconectado",
+    "sensores": { "humedad": 32, "temperatura": 20, "nivel": 12 },
+    "actuadores": { "bomba": "OFF", "panel": "OFF", "ventilador": "OFF" }
   }
 ]
