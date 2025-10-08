@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "nombre": "Maceta Principal",
+    "estado": "Conectado",
+    "sensores": { "humedad": 47, "temperatura": 23, "nivel": 72 },
+    "actuadores": { "bomba": "OFF", "panel": "ON", "ventilador": "OFF" }
+  },
+  {
+    "id": 2,
+    "nombre": "Maceta de Hierbas",
+    "estado": "Desconectado",
+    "sensores": { "humedad": 32, "temperatura": 20, "nivel": 12 },
+    "actuadores": { "bomba": "OFF", "panel": "OFF", "ventilador": "OFF" }
+  }
+]

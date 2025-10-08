@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Maceta | Nube de Tierra</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand-icon" aria-hidden="true">🌱</span>
+        <div>
+          <h1>Nube de Tierra</h1>
+          <p class="subtitle">Panel de control de macetas inteligentes</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="add-pot" class="primary-action" type="button">
+          <span aria-hidden="true">➕</span> Agregar maceta
+        </button>
+        <button id="toggle-admin" class="secondary-action" type="button">
+          <span aria-hidden="true">👤</span> Panel admin
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section class="dashboard-summary" aria-label="Resumen del sistema">
+        <article class="summary-card">
+          <p class="summary-label">Total de macetas</p>
+          <p id="summary-total" class="summary-value">0</p>
+        </article>
+        <article class="summary-card">
+          <p class="summary-label">Conectadas</p>
+          <p id="summary-connected" class="summary-value">0</p>
+        </article>
+        <article class="summary-card">
+          <p class="summary-label">Con alertas</p>
+          <p id="summary-alerts" class="summary-value">0</p>
+        </article>
+        <article class="summary-card">
+          <p class="summary-label">Humedad promedio</p>
+          <p id="summary-humidity" class="summary-value">0%</p>
+        </article>
+      </section>
+
+      <section class="filters" aria-label="Filtros de macetas">
+        <button class="filter-button is-active" data-filter="all" type="button">Todas</button>
+        <button class="filter-button" data-filter="connected" type="button">Conectadas</button>
+        <button class="filter-button" data-filter="alerts" type="button">Alertas</button>
+      </section>
+
+      <section id="pots-container" class="pots-grid" aria-live="polite"></section>
+    </main>
+
+    <template id="pot-card-template">
+      <article class="pot-card" data-id="">
+        <header class="pot-card__header">
+          <h2 class="pot-name"></h2>
+          <span class="connection-status" role="status"></span>
+        </header>
+        <div class="sensor-values">
+          <div class="sensor-value">
+            <span class="icon" aria-hidden="true">💧</span>
+            <div>
+              <p>Humedad</p>
+              <p class="value humidity"></p>
+            </div>
+            <span class="alert" aria-hidden="true" title="Alerta de humedad"></span>
+          </div>
+          <div class="sensor-value">
+            <span class="icon" aria-hidden="true">🌡️</span>
+            <div>
+              <p>Temperatura</p>
+              <p class="value temperature"></p>
+            </div>
+          </div>
+          <div class="sensor-value">
+            <span class="icon" aria-hidden="true">🔋</span>
+            <div>
+              <p>Nivel de agua</p>
+              <p class="value level"></p>
+            </div>
+            <span class="alert" aria-hidden="true" title="Alerta de nivel"></span>
+          </div>
+        </div>
+        <div class="actuator-controls">
+          <button class="actuator" data-actuator="bomba" type="button"></button>
+          <button class="actuator" data-actuator="panel" type="button"></button>
+          <button class="actuator" data-actuator="ventilador" type="button"></button>
+        </div>
+      </article>
+    </template>
+
+    <aside id="admin-panel" class="admin-panel" aria-hidden="true">
+      <div class="admin-panel__overlay" data-close-admin></div>
+      <div class="admin-panel__content" role="dialog" aria-modal="true" aria-labelledby="admin-panel-title">
+        <header class="admin-panel__header">
+          <div>
+            <h2 id="admin-panel-title">Panel administrativo</h2>
+            <p class="admin-panel__subtitle">Gestión rápida de módulos y responsables</p>
+          </div>
+          <button class="icon-button" type="button" data-close-admin aria-label="Cerrar panel">
+            ✕
+          </button>
+        </header>
+        <section class="admin-section">
+          <h3>Equipo responsable</h3>
+          <ul id="admin-users" class="admin-users" aria-live="polite"></ul>
+        </section>
+        <section class="admin-section">
+          <h3>Macetas registradas</h3>
+          <ul id="admin-modules" class="admin-modules" aria-live="polite"></ul>
+        </section>
+      </div>
+    </aside>
+    <script src="app.js" type="module"></script>
+  </body>
+</html>
