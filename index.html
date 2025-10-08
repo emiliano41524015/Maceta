@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Maceta | Nube de Tierra</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand-icon" aria-hidden="true">🌱</span>
+        <div>
+          <h1>Nube de Tierra</h1>
+          <p class="subtitle">Panel de control de macetas inteligentes</p>
+        </div>
+      </div>
+      <button id="add-pot" class="primary-action" type="button">
+        <span aria-hidden="true">➕</span> Agregar maceta
+      </button>
+    </header>
+
+    <main>
+      <section id="pots-container" class="pots-grid" aria-live="polite"></section>
+    </main>
+
+    <template id="pot-card-template">
+      <article class="pot-card" data-id="">
+        <header class="pot-card__header">
+          <h2 class="pot-name"></h2>
+          <span class="connection-status" role="status"></span>
+        </header>
+        <div class="sensor-values">
+          <div class="sensor-value">
+            <span class="icon" aria-hidden="true">💧</span>
+            <div>
+              <p>Humedad</p>
+              <p class="value humidity"></p>
+            </div>
+            <span class="alert" aria-hidden="true" title="Alerta de humedad"></span>
+          </div>
+          <div class="sensor-value">
+            <span class="icon" aria-hidden="true">🌡️</span>
+            <div>
+              <p>Temperatura</p>
+              <p class="value temperature"></p>
+            </div>
+          </div>
+          <div class="sensor-value">
+            <span class="icon" aria-hidden="true">🔋</span>
+            <div>
+              <p>Nivel de agua</p>
+              <p class="value level"></p>
+            </div>
+            <span class="alert" aria-hidden="true" title="Alerta de nivel"></span>
+          </div>
+        </div>
+        <div class="actuator-controls">
+          <button class="actuator" data-actuator="bomba" type="button"></button>
+          <button class="actuator" data-actuator="panel" type="button"></button>
+          <button class="actuator" data-actuator="ventilador" type="button"></button>
+        </div>
+      </article>
+    </template>
+
+    <script src="app.js" type="module"></script>
+  </body>
+</html>
